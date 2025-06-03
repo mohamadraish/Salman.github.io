@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ગ્રાહકની વિગતો</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  h1 { margin-bottom: 10px; }
+  input, button { font-size: 16px; padding: 8px; margin: 5px 0; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #f4f4f4; }
+  button.action-btn { margin-right: 5px; }
+</style>
+</head>
+<body>
+
+<h1 id="customerTitle">ગ્રાહક: </h1>
+
+<label>ઉધાર રકમ (₹): </label><br />
+<input type="number" id="amountInput" placeholder="જેમ કે 500" />
+<button onclick="addEntry()">એડ ઉધાર</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>તારીખ અને સમય</th>
+      <th>રકમ (₹)</th>
+      <th>એક્શન</th>
+    </tr>
+  </thead>
+  <tbody id="entriesTableBody"></tbody>
+  <tfoot>
+    <tr>
+      <th>ટોટલ બાકી</th>
+      <th id="totalAmount">0</th>
+      <th></th>
+    </tr>
+  </tfoot>
+</table>
+
+<br />
+<button onclick="printPage()">પ્રિન્ટ કરો</button>
+<button onclick="downloadPDF()">PDF ડાઉનલોડ કરો</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  // URL થી ગ્રાહકનું નામ લાવવામાં આવશે
+  const params = new URLSearchParams(window.location.search);
+  const customerName = params.get('name');
+  if (!customerName) {
+    alert('ગ્રાહકનું નામ મળી શક્યું નથી!');
+    window.close();
+  }
+
+  document.getElementById('customerTitle').textContent = `ગ્રાહક: ${customerName}`;
+
+  // બધા ગ્રાહકો માટે data localStorage માં aise structure માં રહેશે:
+  // { "ગ્રાહકનામ1": [{amount:100, datetime:"..."}, {...}], "ગ્રાહકનામ2": [...] }
+  function getAllData() {
+    return JSON.parse(localStorage.getItem('customerEntries') || '{}');
+  }
+
+  function saveAllData(data) {
+    localStorage.setItem('customerEntries', JSON.stringify(data));
+  }
+
+  function getEntries() {
+    const allData = getAllData();
+    return allData[customerName] || [];
+  }
+
+  function saveEntries(entries) {
+    const allData = getAllData();
+    allData[customerName] = entries;
+    saveAllData(allData);
+  }
+
+  function renderEntries() {
+    const tbody = document.getElementById('entriesTableBody');
+    const entries = getEntries();
+    tbody.innerHTML = '';
+
+    let total = 0;
+
+    entries.forEach((entry, index) => {
+      total += entry.amount;
+      const tr = document.createElement('tr');
+
+      const tdDate = document.createElement('td');
+      tdDate.textContent = entry.datetime;
+      tr.appendChild(tdDate);
+
+      const tdAmount = document.createElement('td');
+      tdAmount.textContent = entry.amount.toFixed(2);
+      tr.appendChild(tdAmount);
+
+      const tdAction = document.createElement('td');
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Delete';
+      delBtn.className = 'action-btn';
+      delBtn.onclick = () => {
+        if (confirm('શું તમે આ એન્ટ્રી દૂર કરવા માંગો છો?')) {
+          entries.splice(index, 1);
+          saveEntries(entries);
+          renderEntries();
+        }
+      };
+      tdAction.appendChild(delBtn);
+      tr.appendChild(tdAction);
+
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('totalAmount').textContent = total.toFixed(2);
+  }
+
+  function addEntry() {
+    const amountInput = document.getElementById('amountInput');
+    const amount = parseFloat(amountInput.value);
+    if (isNaN(amount) || amount <= 0) {
+      alert('કૃપા કરીને માન્ય રકમ દાખલ કરો');
+      return;
+    }
+    const entries = getEntries();
+    const now = new Date();
+    const datetime = now.toLocaleString('gu-IN', { hour12: false });
+    entries.push({ amount, datetime });
+    saveEntries(entries);
+    amountInput.value = '';
+    renderEntries();
+  }
+
+  function printPage() {
+    window.print();
+  }
+
+  async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text(`ગ્રાહક: ${customerName}`, 10, 10);
+    doc.setFontSize(12);
+
+    const entries = getEntries();
+    let y = 20;
+
+    doc.text('તારીખ અને સમય    રકમ (₹)', 10, y);
+    y += 8;
+
+    entries.forEach(e => {
+      doc.text(`${e.datetime}    ₹${e.amount.toFixed(2)}`, 10, y);
+      y += 8;
+    });
+
+    const total = entries.reduce((acc, e) => acc + e.amount, 0);
+    y += 10;
+    doc.text(`ટોટલ બાકી: ₹${total.toFixed(2)}`, 10, y);
+
+    doc.save(`${customerName}_ledger.pdf`);
+  }
+
+  renderEntries();
+</script>
+</body>
+</html>
