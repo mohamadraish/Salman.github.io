@@ -8,7 +8,8 @@
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; }
   h1 { margin-bottom: 10px; }
-  input, button { font-size: 16px; padding: 8px; margin: 5px 0; }
+  label { display: block; margin-top: 10px; }
+  input, button { font-size: 16px; padding: 6px; margin-top: 4px; }
   table { border-collapse: collapse; width: 100%; margin-top: 20px; }
   th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   th { background: #f4f4f4; }
@@ -19,23 +20,37 @@
 
 <h1 id="customerTitle">ગ્રાહક: </h1>
 
-<label>ઉધાર રકમ (₹): </label><br />
+<label>પ્રોડક્ટનું નામ:</label>
+<input type="text" id="productInput" placeholder="જેમ કે Mobile" />
+
+<label>દુકાનનું નામ:</label>
+<input type="text" id="shopInput" placeholder="જેમ કે XYZ Store" />
+
+<label>ઉધાર રકમ (₹):</label>
 <input type="number" id="amountInput" placeholder="જેમ કે 500" />
+
+<label>સફત (₹):</label>
+<input type="number" id="profitInput" placeholder="જેમ કે 50" />
+
 <button onclick="addEntry()">એડ ઉધાર</button>
 
 <table>
   <thead>
     <tr>
       <th>તારીખ અને સમય</th>
+      <th>પ્રોડક્ટ</th>
+      <th>દુકાન</th>
       <th>રકમ (₹)</th>
+      <th>સફત (₹)</th>
       <th>એક્શન</th>
     </tr>
   </thead>
   <tbody id="entriesTableBody"></tbody>
   <tfoot>
     <tr>
-      <th>ટોટલ બાકી</th>
+      <th colspan="3">ટોટલ</th>
       <th id="totalAmount">0</th>
+      <th id="totalProfit">0</th>
       <th></th>
     </tr>
   </tfoot>
@@ -45,7 +60,6 @@
 <button onclick="printPage()">પ્રિન્ટ કરો</button>
 
 <script>
-  // URL માંથી ગ્રાહકનું નામ લેશો
   const params = new URLSearchParams(window.location.search);
   const customerName = params.get('name');
   if (!customerName) {
@@ -80,18 +94,33 @@
     tbody.innerHTML = '';
 
     let total = 0;
+    let totalProfit = 0;
 
     entries.forEach((entry, index) => {
       total += entry.amount;
+      totalProfit += entry.profit;
+
       const tr = document.createElement('tr');
 
       const tdDate = document.createElement('td');
       tdDate.textContent = entry.datetime;
       tr.appendChild(tdDate);
 
+      const tdProduct = document.createElement('td');
+      tdProduct.textContent = entry.product;
+      tr.appendChild(tdProduct);
+
+      const tdShop = document.createElement('td');
+      tdShop.textContent = entry.shop;
+      tr.appendChild(tdShop);
+
       const tdAmount = document.createElement('td');
       tdAmount.textContent = entry.amount.toFixed(2);
       tr.appendChild(tdAmount);
+
+      const tdProfit = document.createElement('td');
+      tdProfit.textContent = entry.profit.toFixed(2);
+      tr.appendChild(tdProfit);
 
       const tdAction = document.createElement('td');
       const delBtn = document.createElement('button');
@@ -111,21 +140,44 @@
     });
 
     document.getElementById('totalAmount').textContent = total.toFixed(2);
+    document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
   }
 
   function addEntry() {
-    const amountInput = document.getElementById('amountInput');
-    const amount = parseFloat(amountInput.value);
+    const product = document.getElementById('productInput').value.trim();
+    const shop = document.getElementById('shopInput').value.trim();
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    const profit = parseFloat(document.getElementById('profitInput').value);
+
+    if (!product) {
+      alert('કૃપા કરીને પ્રોડક્ટનું નામ દાખલ કરો');
+      return;
+    }
+    if (!shop) {
+      alert('કૃપા કરીને દુકાનનું નામ દાખલ કરો');
+      return;
+    }
     if (isNaN(amount) || amount <= 0) {
       alert('કૃપા કરીને માન્ય રકમ દાખલ કરો');
       return;
     }
+    if (isNaN(profit)) {
+      alert('કૃપા કરીને માન્ય સફત દાખલ કરો');
+      return;
+    }
+
     const entries = getEntries();
     const now = new Date();
     const datetime = now.toLocaleString('gu-IN', { hour12: false });
-    entries.push({ amount, datetime });
+    entries.push({ product, shop, amount, profit, datetime });
     saveEntries(entries);
-    amountInput.value = '';
+
+    // Clear inputs
+    document.getElementById('productInput').value = '';
+    document.getElementById('shopInput').value = '';
+    document.getElementById('amountInput').value = '';
+    document.getElementById('profitInput').value = '';
+
     renderEntries();
   }
 
