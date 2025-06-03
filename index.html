@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ગ્રાહક યાદી</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  input, button { font-size: 16px; padding: 8px; margin: 5px 0; }
+  ul { list-style: none; padding: 0; }
+  li { margin: 8px 0; cursor: pointer; color: blue; text-decoration: underline; }
+</style>
+</head>
+<body>
+<h1>ગ્રાહક ઉમેરો</h1>
+<input type="text" id="customerName" placeholder="ગ્રાહકનું નામ લખો" />
+<button onclick="addCustomer()">ઉમેરો</button>
+
+<h2>ગ્રાહક લિસ્ટ</h2>
+<ul id="customerList"></ul>
+
+<script>
+function getCustomers() {
+  return JSON.parse(localStorage.getItem('customers') || '[]');
+}
+
+function saveCustomers(customers) {
+  localStorage.setItem('customers', JSON.stringify(customers));
+}
+
+function addCustomer() {
+  const nameInput = document.getElementById('customerName');
+  const name = nameInput.value.trim();
+  if (!name) {
+    alert('કૃપા કરીને નામ દાખલ કરો');
+    return;
+  }
+  let customers = getCustomers();
+  if (customers.find(c => c.toLowerCase() === name.toLowerCase())) {
+    alert('આ નામ પહેલેથી હાજર છે');
+    return;
+  }
+  customers.push(name);
+  saveCustomers(customers);
+  nameInput.value = '';
+  renderCustomers();
+}
+
+function renderCustomers() {
+  const list = document.getElementById('customerList');
+  list.innerHTML = '';
+  const customers = getCustomers();
+  customers.forEach(name => {
+    const li = document.createElement('li');
+    li.textContent = name;
+    li.onclick = () => {
+      window.open(`details.html?name=${encodeURIComponent(name)}`, '_blank');
+    };
+    list.appendChild(li);
+  });
+}
+
+renderCustomers();
+</script>
+</body>
+</html>
