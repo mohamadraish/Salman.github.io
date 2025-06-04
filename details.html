@@ -2,190 +2,125 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ગ્રાહકની વિગતો</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  h1 { margin-bottom: 10px; }
-  label { display: block; margin-top: 10px; }
-  input, button { font-size: 16px; padding: 6px; margin-top: 4px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  th { background: #f4f4f4; }
-  button.action-btn { margin-right: 5px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ગ્રાહક વિગતો</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121221;
+      color: #ffffff;
+      padding: 20px;
+    }
+    h2 {
+      color: #ffdd99;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #333;
+      text-align: left;
+    }
+    th {
+      background-color: #2e2e3f;
+      color: #f2c766;
+    }
+    td {
+      background-color: #1d1d2c;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 5px 0 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+    }
+    input {
+      background-color: #2b2b3c;
+      color: #fff;
+    }
+    button {
+      background-color: #f2c766;
+      color: #000;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+  <h2 id="customerName"></h2>
 
-<h1 id="customerTitle">ગ્રાહક: </h1>
+  <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
+  <input type="text" id="amount" placeholder="જમા રકમ" />
+  <input type="text" id="shop" placeholder="દુકાનનું નામ" />
+  <button onclick="addEntry()">ઉમેરો</button>
 
-<label>પ્રોડક્ટનું નામ:</label>
-<input type="text" id="productInput" placeholder="જેમ કે Mobile" />
+  <table>
+    <thead>
+      <tr>
+        <th>તારીખ</th>
+        <th>પ્રોડક્ટ</th>
+        <th>જમા</th>
+        <th>દુકાન</th>
+      </tr>
+    </thead>
+    <tbody id="entryTable"></tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2">કુલ રકમ</th>
+        <th colspan="2" id="totalAmount">₹0</th>
+      </tr>
+    </tfoot>
+  </table>
 
-<label>દુકાનનું નામ:</label>
-<input type="text" id="shopInput" placeholder="જેમ કે XYZ Store" />
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const customer = urlParams.get('name');
+    document.getElementById('customerName').textContent = customer + 'ની વિગતો';
 
-<label>ઉધાર રકમ (₹):</label>
-<input type="number" id="amountInput" placeholder="જેમ કે 500" />
+    function loadEntries() {
+      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
+      const tbody = document.getElementById('entryTable');
+      let total = 0;
+      tbody.innerHTML = '';
+      entries.forEach(entry => {
+        const row = document.createElement('tr');
+        row.innerHTML = \`
+          <td>\${entry.date}</td>
+          <td>\${entry.product}</td>
+          <td>₹\${entry.amount}</td>
+          <td>\${entry.shop}</td>
+        \`;
+        tbody.appendChild(row);
+        total += parseFloat(entry.amount);
+      });
+      document.getElementById('totalAmount').textContent = '₹' + total.toFixed(2);
+    }
 
-<label>સફત (₹):</label>
-<input type="number" id="profitInput" placeholder="જેમ કે 50" />
-
-<button onclick="addEntry()">એડ ઉધાર</button>
-
-<table>
-  <thead>
-    <tr>
-      <th>તારીખ અને સમય</th>
-      <th>પ્રોડક્ટ</th>
-      <th>દુકાન</th>
-      <th>રકમ (₹)</th>
-      <th>સફત (₹)</th>
-      <th>એક્શન</th>
-    </tr>
-  </thead>
-  <tbody id="entriesTableBody"></tbody>
-  <tfoot>
-    <tr>
-      <th colspan="3">ટોટલ</th>
-      <th id="totalAmount">0</th>
-      <th id="totalProfit">0</th>
-      <th></th>
-    </tr>
-  </tfoot>
-</table>
-
-<br />
-<button onclick="printPage()">પ્રિન્ટ કરો</button>
-
-<script>
-  const params = new URLSearchParams(window.location.search);
-  const customerName = params.get('name');
-  if (!customerName) {
-    alert('ગ્રાહકનું નામ મળી શક્યું નથી!');
-    window.close();
-  }
-
-  document.getElementById('customerTitle').textContent = `ગ્રાહક: ${customerName}`;
-
-  function getAllData() {
-    return JSON.parse(localStorage.getItem('customerEntries') || '{}');
-  }
-
-  function saveAllData(data) {
-    localStorage.setItem('customerEntries', JSON.stringify(data));
-  }
-
-  function getEntries() {
-    const allData = getAllData();
-    return allData[customerName] || [];
-  }
-
-  function saveEntries(entries) {
-    const allData = getAllData();
-    allData[customerName] = entries;
-    saveAllData(allData);
-  }
-
-  function renderEntries() {
-    const tbody = document.getElementById('entriesTableBody');
-    const entries = getEntries();
-    tbody.innerHTML = '';
-
-    let total = 0;
-    let totalProfit = 0;
-
-    entries.forEach((entry, index) => {
-      total += entry.amount;
-      totalProfit += entry.profit;
-
-      const tr = document.createElement('tr');
-
-      const tdDate = document.createElement('td');
-      tdDate.textContent = entry.datetime;
-      tr.appendChild(tdDate);
-
-      const tdProduct = document.createElement('td');
-      tdProduct.textContent = entry.product;
-      tr.appendChild(tdProduct);
-
-      const tdShop = document.createElement('td');
-      tdShop.textContent = entry.shop;
-      tr.appendChild(tdShop);
-
-      const tdAmount = document.createElement('td');
-      tdAmount.textContent = entry.amount.toFixed(2);
-      tr.appendChild(tdAmount);
-
-      const tdProfit = document.createElement('td');
-      tdProfit.textContent = entry.profit.toFixed(2);
-      tr.appendChild(tdProfit);
-
-      const tdAction = document.createElement('td');
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Delete';
-      delBtn.className = 'action-btn';
-      delBtn.onclick = () => {
-        if (confirm('શું તમે આ એન્ટ્રી દૂર કરવા માંગો છો?')) {
-          entries.splice(index, 1);
-          saveEntries(entries);
-          renderEntries();
-        }
+    function addEntry() {
+      const product = document.getElementById('product').value;
+      const amount = document.getElementById('amount').value;
+      const shop = document.getElementById('shop').value;
+      if (!product || !amount || !shop) return alert("બધી વિગતો દાખલ કરો");
+      const entry = {
+        product,
+        amount,
+        shop,
+        date: new Date().toLocaleDateString()
       };
-      tdAction.appendChild(delBtn);
-      tr.appendChild(tdAction);
-
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById('totalAmount').textContent = total.toFixed(2);
-    document.getElementById('totalProfit').textContent = totalProfit.toFixed(2);
-  }
-
-  function addEntry() {
-    const product = document.getElementById('productInput').value.trim();
-    const shop = document.getElementById('shopInput').value.trim();
-    const amount = parseFloat(document.getElementById('amountInput').value);
-    const profit = parseFloat(document.getElementById('profitInput').value);
-
-    if (!product) {
-      alert('કૃપા કરીને પ્રોડક્ટનું નામ દાખલ કરો');
-      return;
-    }
-    if (!shop) {
-      alert('કૃપા કરીને દુકાનનું નામ દાખલ કરો');
-      return;
-    }
-    if (isNaN(amount) || amount <= 0) {
-      alert('કૃપા કરીને માન્ય રકમ દાખલ કરો');
-      return;
-    }
-    if (isNaN(profit)) {
-      alert('કૃપા કરીને માન્ય સફત દાખલ કરો');
-      return;
+      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
+      entries.push(entry);
+      localStorage.setItem(customer, JSON.stringify(entries));
+      document.getElementById('product').value = '';
+      document.getElementById('amount').value = '';
+      document.getElementById('shop').value = '';
+      loadEntries();
     }
 
-    const entries = getEntries();
-    const now = new Date();
-    const datetime = now.toLocaleString('gu-IN', { hour12: false });
-    entries.push({ product, shop, amount, profit, datetime });
-    saveEntries(entries);
-
-    // Clear inputs
-    document.getElementById('productInput').value = '';
-    document.getElementById('shopInput').value = '';
-    document.getElementById('amountInput').value = '';
-    document.getElementById('profitInput').value = '';
-
-    renderEntries();
-  }
-
-  function printPage() {
-    window.print();
-  }
-
-  renderEntries();
-</script>
+    loadEntries();
+  </script>
 </body>
 </html>

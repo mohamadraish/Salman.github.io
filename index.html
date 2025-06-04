@@ -2,66 +2,95 @@
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ગ્રાહક યાદી</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; }
-  input, button { font-size: 16px; padding: 8px; margin: 5px 0; }
-  ul { list-style: none; padding: 0; }
-  li { margin: 8px 0; cursor: pointer; color: blue; text-decoration: underline; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ગ્રાહકો</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f1a;
+      color: #e5e5e5;
+      padding: 20px;
+    }
+    h1 {
+      color: #f0d188;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    input, button {
+      font-size: 1em;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+    }
+    input {
+      width: calc(100% - 22px);
+      background: #1c1c2e;
+      color: #fff;
+    }
+    button {
+      background-color: #d1a954;
+      color: #000;
+      cursor: pointer;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-top: 10px;
+      background-color: #1f1f2f;
+      padding: 10px;
+      border-radius: 6px;
+      transition: background 0.3s ease;
+    }
+    li:hover {
+      background-color: #2a2a3d;
+    }
+    a {
+      color: #f0d188;
+      text-decoration: none;
+      font-size: 1.1em;
+    }
+  </style>
 </head>
 <body>
-<h1>ગ્રાહક ઉમેરો</h1>
-<input type="text" id="customerName" placeholder="ગ્રાહકનું નામ લખો" />
-<button onclick="addCustomer()">ઉમેરો</button>
+  <h1>ગ્રાહકોની યાદી</h1>
+  <input type="text" id="customerName" placeholder="નવું ગ્રાહક નામ લખો" />
+  <button onclick="addCustomer()">ઉમેરો</button>
+  <ul id="customerList"></ul>
 
-<h2>ગ્રાહક લિસ્ટ</h2>
-<ul id="customerList"></ul>
+  <script>
+    const customerList = document.getElementById('customerList');
+    const customerName = document.getElementById('customerName');
 
-<script>
-function getCustomers() {
-  return JSON.parse(localStorage.getItem('customers') || '[]');
-}
+    function loadCustomers() {
+      const customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      customerList.innerHTML = '';
+      customers.forEach(name => {
+        const li = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = `details.html?name=${encodeURIComponent(name)}`;
+        link.textContent = name;
+        li.appendChild(link);
+        customerList.appendChild(li);
+      });
+    }
 
-function saveCustomers(customers) {
-  localStorage.setItem('customers', JSON.stringify(customers));
-}
+    function addCustomer() {
+      const name = customerName.value.trim();
+      if (!name) return alert('કૃપા કરીને ગ્રાહક નામ લખો');
+      let customers = JSON.parse(localStorage.getItem('customers') || '[]');
+      if (!customers.includes(name)) {
+        customers.push(name);
+        localStorage.setItem('customers', JSON.stringify(customers));
+        loadCustomers();
+      }
+      customerName.value = '';
+    }
 
-function addCustomer() {
-  const nameInput = document.getElementById('customerName');
-  const name = nameInput.value.trim();
-  if (!name) {
-    alert('કૃપા કરીને નામ દાખલ કરો');
-    return;
-  }
-  let customers = getCustomers();
-  if (customers.find(c => c.toLowerCase() === name.toLowerCase())) {
-    alert('આ નામ પહેલેથી હાજર છે');
-    return;
-  }
-  customers.push(name);
-  saveCustomers(customers);
-  nameInput.value = '';
-  renderCustomers();
-}
-
-function renderCustomers() {
-  const list = document.getElementById('customerList');
-  list.innerHTML = '';
-  const customers = getCustomers();
-  customers.forEach(name => {
-    const li = document.createElement('li');
-    li.textContent = name;
-    li.onclick = () => {
-      window.open(`details.html?name=${encodeURIComponent(name)}`, '_blank');
-    };
-    list.appendChild(li);
-  });
-}
-
-renderCustomers();
-</script>
+    loadCustomers();
+  </script>
 </body>
 </html>
