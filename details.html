@@ -54,7 +54,8 @@
   <h2 id="customerName"></h2>
 
   <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
-  <input type="text" id="amount" placeholder="જમા રકમ" />
+  <input type="number" id="credit" placeholder="ઉધાર રકમ" />
+  <input type="number" id="amount" placeholder="જમા રકમ" />
   <input type="text" id="shop" placeholder="દુકાનનું નામ" />
   <button onclick="addEntry()">ઉમેરો</button>
 
@@ -63,6 +64,7 @@
       <tr>
         <th>તારીખ</th>
         <th>પ્રોડક્ટ</th>
+        <th>ઉધાર</th>
         <th>જમા</th>
         <th>દુકાન</th>
       </tr>
@@ -70,8 +72,10 @@
     <tbody id="entryTable"></tbody>
     <tfoot>
       <tr>
-        <th colspan="2">કુલ રકમ</th>
-        <th colspan="2" id="totalAmount">₹0</th>
+        <th colspan="2">કુલ ઉધાર</th>
+        <th colspan="1" id="totalCredit">₹0</th>
+        <th>કુલ જમા</th>
+        <th id="totalAmount">₹0</th>
       </tr>
     </tfoot>
   </table>
@@ -84,29 +88,35 @@
     function loadEntries() {
       const entries = JSON.parse(localStorage.getItem(customer) || '[]');
       const tbody = document.getElementById('entryTable');
-      let total = 0;
+      let totalAmount = 0;
+      let totalCredit = 0;
       tbody.innerHTML = '';
       entries.forEach(entry => {
         const row = document.createElement('tr');
         row.innerHTML = \`
           <td>\${entry.date}</td>
           <td>\${entry.product}</td>
+          <td>₹\${entry.credit}</td>
           <td>₹\${entry.amount}</td>
           <td>\${entry.shop}</td>
         \`;
         tbody.appendChild(row);
-        total += parseFloat(entry.amount);
+        totalAmount += parseFloat(entry.amount || 0);
+        totalCredit += parseFloat(entry.credit || 0);
       });
-      document.getElementById('totalAmount').textContent = '₹' + total.toFixed(2);
+      document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
+      document.getElementById('totalCredit').textContent = '₹' + totalCredit.toFixed(2);
     }
 
     function addEntry() {
       const product = document.getElementById('product').value;
-      const amount = document.getElementById('amount').value;
+      const credit = document.getElementById('credit').value || "0";
+      const amount = document.getElementById('amount').value || "0";
       const shop = document.getElementById('shop').value;
-      if (!product || !amount || !shop) return alert("બધી વિગતો દાખલ કરો");
+      if (!product || !shop) return alert("બધી વિગતો દાખલ કરો");
       const entry = {
         product,
+        credit,
         amount,
         shop,
         date: new Date().toLocaleDateString()
@@ -115,6 +125,7 @@
       entries.push(entry);
       localStorage.setItem(customer, JSON.stringify(entries));
       document.getElementById('product').value = '';
+      document.getElementById('credit').value = '';
       document.getElementById('amount').value = '';
       document.getElementById('shop').value = '';
       loadEntries();
