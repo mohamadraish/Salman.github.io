@@ -1,8 +1,10 @@
+
+       
 <!DOCTYPE html>
 <html lang="gu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ગ્રાહક વિગતો</title>
   <style>
     body {
@@ -47,6 +49,14 @@
       color: #000;
       cursor: pointer;
     }
+    button.edit-btn {
+      background-color: #66a3ff;
+      color: white;
+    }
+    button.delete-btn {
+      background-color: #ff6666;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -55,7 +65,7 @@
   <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
   <input type="number" id="credit" placeholder="ઉધાર રકમ" />
   <input type="number" id="amount" placeholder="જમા રકમ" />
-  <button onclick="addEntry()">ઉમેરો</button>
+  <button id="addBtn" onclick="addOrUpdateEntry()">ઉમેરો</button>
 
   <table>
     <thead>
@@ -64,6 +74,8 @@
         <th>પ્રોડક્ટ</th>
         <th>ઉધાર</th>
         <th>જમા</th>
+        <th>સંપાદિત કરો</th>
+        <th>કાઢી નાખો</th>
       </tr>
     </thead>
     <tbody id="entryTable"></tbody>
@@ -72,6 +84,7 @@
         <th colspan="2">કુલ ઉધાર</th>
         <th id="totalCredit">₹0</th>
         <th id="totalAmount">₹0</th>
+        <th colspan="2"></th>
       </tr>
     </tfoot>
   </table>
@@ -86,6 +99,8 @@
     }
     nameEl.textContent = customer + ' ની વિગતો';
 
+    let editIndex = -1; // -1 means new entry, otherwise editing existing
+
     function loadEntries() {
       const entries = JSON.parse(localStorage.getItem(customer) || '[]');
       const tbody = document.getElementById('entryTable');
@@ -93,13 +108,15 @@
       let totalCredit = 0;
       let totalAmount = 0;
 
-      entries.forEach(entry => {
+      entries.forEach((entry, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${entry.date}</td>
           <td>${entry.product}</td>
           <td>₹${Number(entry.credit).toFixed(2)}</td>
           <td>₹${Number(entry.amount).toFixed(2)}</td>
+          <td><button class="edit-btn" onclick="editEntry(${index})">સંપાદિત કરો</button></td>
+          <td><button class="delete-btn" onclick="deleteEntry(${index})">કાઢી નાખો</button></td>
         `;
         tbody.appendChild(row);
         totalCredit += Number(entry.credit);
@@ -110,32 +127,48 @@
       document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
     }
 
-    function addEntry() {
+    function addOrUpdateEntry() {
       const product = document.getElementById('product').value.trim();
-      const credit = document.getElementById('credit').value;
-      const amount = document.getElementById('amount').value;
+      const creditVal = document.getElementById('credit').value;
+      const amountVal = document.getElementById('amount').value;
 
       if (!product) {
         alert("પ્રોડક્ટનું નામ લખો");
         return;
       }
-      if (credit === '' && amount === '') {
+      if (creditVal === '' && amountVal === '') {
         alert("ઉધાર કે જમા રકમમાંથી એક આપો");
         return;
       }
 
-      const newEntry = {
-        date: new Date().toLocaleDateString(),
-        product,
-        credit: credit === '' ? 0 : Number(credit),
-        amount: amount === '' ? 0 : Number(amount)
-      };
+      const credit = creditVal === '' ? 0 : Number(creditVal);
+      const amount = amountVal === '' ? 0 : Number(amountVal);
 
-      const oldEntries = JSON.parse(localStorage.getItem(customer) || '[]');
-      oldEntries.push(newEntry);
-      localStorage.setItem(customer, JSON.stringify(oldEntries));
+      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
 
-      // Clear input fields
+      if (editIndex === -1) {
+        // Add new
+        entries.push({
+          date: new Date().toLocaleDateString(),
+          product,
+          credit,
+          amount
+        });
+      } else {
+        // Update existing
+        entries[editIndex] = {
+          date: entries[editIndex].date, // keep old date
+          product,
+          credit,
+          amount
+        };
+        editIndex = -1;
+        document.getElementById('addBtn').textContent = 'ઉમેરો';
+      }
+
+      localStorage.setItem(customer, JSON.stringify(entries));
+
+      // Clear input
       document.getElementById('product').value = '';
       document.getElementById('credit').value = '';
       document.getElementById('amount').value = '';
@@ -143,9 +176,36 @@
       loadEntries();
     }
 
+    function editEntry(index) {
+      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
+      const entry = entries[index];
+
+      document.getElementById('product').value = entry.product;
+      document.getElementById('credit').value = entry.credit;
+      document.getElementById('amount').value = entry.amount;
+
+      editIndex = index;
+      document.getElementById('addBtn').textContent = 'સંપાદિત કરો';
+    }
+
+    function deleteEntry(index) {
+      if (confirm("શું તમે આ એન્ટ્રી કાઢી નાખવી છે?")) {
+        const entries = JSON.parse(localStorage.getItem(customer) || '[]');
+        entries.splice(index, 1);
+        localStorage.setItem(customer, JSON.stringify(entries));
+        if(editIndex === index) {
+          editIndex = -1;
+          document.getElementById('addBtn').textContent = 'ઉમેરો';
+          document.getElementById('product').value = '';
+          document.getElementById('credit').value = '';
+          document.getElementById('amount').value = '';
+        }
+        loadEntries();
+      }
+    }
+
     loadEntries();
   </script>
 </body>
 </html>
-
 
