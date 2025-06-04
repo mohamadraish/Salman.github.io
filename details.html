@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="gu">
 <head>
@@ -56,7 +55,6 @@
   <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
   <input type="number" id="credit" placeholder="ઉધાર રકમ" />
   <input type="number" id="amount" placeholder="જમા રકમ" />
-  <input type="text" id="shop" placeholder="દુકાનનું નામ" />
   <button onclick="addEntry()">ઉમેરો</button>
 
   <table>
@@ -66,15 +64,13 @@
         <th>પ્રોડક્ટ</th>
         <th>ઉધાર</th>
         <th>જમા</th>
-        <th>દુકાન</th>
       </tr>
     </thead>
     <tbody id="entryTable"></tbody>
     <tfoot>
       <tr>
         <th colspan="2">કુલ ઉધાર</th>
-        <th colspan="1" id="totalCredit">₹0</th>
-        <th>કુલ જમા</th>
+        <th id="totalCredit">₹0</th>
         <th id="totalAmount">₹0</th>
       </tr>
     </tfoot>
@@ -83,55 +79,66 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const customer = urlParams.get('name');
-    document.getElementById('customerName').textContent = customer + 'ની વિગતો';
+    const nameEl = document.getElementById('customerName');
+
+    if (customer) {
+      nameEl.textContent = customer + ' ની વિગતો';
+      loadEntries();
+    } else {
+      alert("ગ્રાહકનું નામ URL માં પાસ થયેલું નથી.");
+    }
 
     function loadEntries() {
       const entries = JSON.parse(localStorage.getItem(customer) || '[]');
       const tbody = document.getElementById('entryTable');
-      let totalAmount = 0;
-      let totalCredit = 0;
       tbody.innerHTML = '';
+      let totalCredit = 0;
+      let totalAmount = 0;
+
       entries.forEach(entry => {
         const row = document.createElement('tr');
-        row.innerHTML = \`
-          <td>\${entry.date}</td>
-          <td>\${entry.product}</td>
-          <td>₹\${entry.credit}</td>
-          <td>₹\${entry.amount}</td>
-          <td>\${entry.shop}</td>
-        \`;
+        row.innerHTML = `
+          <td>${entry.date}</td>
+          <td>${entry.product}</td>
+          <td>₹${entry.credit}</td>
+          <td>₹${entry.amount}</td>
+        `;
         tbody.appendChild(row);
-        totalAmount += parseFloat(entry.amount || 0);
-        totalCredit += parseFloat(entry.credit || 0);
+        totalCredit += Number(entry.credit);
+        totalAmount += Number(entry.amount);
       });
-      document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
+
       document.getElementById('totalCredit').textContent = '₹' + totalCredit.toFixed(2);
+      document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
     }
 
     function addEntry() {
       const product = document.getElementById('product').value;
       const credit = document.getElementById('credit').value || "0";
       const amount = document.getElementById('amount').value || "0";
-      const shop = document.getElementById('shop').value;
-      if (!product || !shop) return alert("બધી વિગતો દાખલ કરો");
-      const entry = {
+
+      if (!product) {
+        alert("પ્રોડક્ટનું નામ લખો");
+        return;
+      }
+
+      const newEntry = {
+        date: new Date().toLocaleDateString(),
         product,
         credit,
-        amount,
-        shop,
-        date: new Date().toLocaleDateString()
+        amount
       };
-      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
-      entries.push(entry);
-      localStorage.setItem(customer, JSON.stringify(entries));
+
+      const oldEntries = JSON.parse(localStorage.getItem(customer) || '[]');
+      oldEntries.push(newEntry);
+      localStorage.setItem(customer, JSON.stringify(oldEntries));
+
       document.getElementById('product').value = '';
       document.getElementById('credit').value = '';
       document.getElementById('amount').value = '';
-      document.getElementById('shop').value = '';
+
       loadEntries();
     }
-
-    loadEntries();
   </script>
 </body>
 </html>
