@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="gu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ગ્રાહક વિગતો</title>
   <style>
     body {
@@ -14,130 +15,32 @@
     h2 {
       color: #ffdd99;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #333;
-      text-align: left;
-    }
-    th {
-      background-color: #2e2e3f;
-      color: #f2c766;
-    }
-    td {
+    .info {
       background-color: #1d1d2c;
-    }
-    input, button {
-      padding: 10px;
-      margin: 10px 5px 0 0;
-      border-radius: 5px;
-      border: none;
-      font-size: 1em;
-    }
-    input {
-      background-color: #2b2b3c;
-      color: #fff;
-    }
-    button {
-      background-color: #f2c766;
-      color: #000;
-      cursor: pointer;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #333;
     }
   </style>
 </head>
 <body>
-  <h2 id="customerName"></h2>
-
-  <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
-  <input type="number" id="credit" placeholder="ઉધાર રકમ" />
-  <input type="number" id="amount" placeholder="જમા રકમ" />
-  <button onclick="addEntry()">ઉમેરો</button>
-
-  <table>
-    <thead>
-      <tr>
-        <th>તારીખ</th>
-        <th>પ્રોડક્ટ</th>
-        <th>ઉધાર</th>
-        <th>જમા</th>
-      </tr>
-    </thead>
-    <tbody id="entryTable"></tbody>
-    <tfoot>
-      <tr>
-        <th colspan="2">કુલ ઉધાર</th>
-        <th id="totalCredit">₹0</th>
-        <th id="totalAmount">₹0</th>
-      </tr>
-    </tfoot>
-  </table>
+  <h2>ગ્રાહક વિગતો</h2>
+  <div class="info" id="customerDetails">લોડ થઈ રહ્યું છે...</div>
 
   <script>
+    function getCustomerDetails(name) {
+      const data = localStorage.getItem(name);
+      return data ? data : "કોઈ માહિતી મળેલ નથી.";
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
-    const customer = urlParams.get('name');
-    const nameEl = document.getElementById('customerName');
+    const name = urlParams.get('name');
 
-    if (customer) {
-      nameEl.textContent = customer + ' ની વિગતો';
-      loadEntries();
+    if (name) {
+      document.getElementById("customerDetails").innerHTML =
+        `<strong>${name}</strong><br><br>` + getCustomerDetails(name);
     } else {
-      alert("ગ્રાહકનું નામ URL માં પાસ થયેલું નથી.");
-    }
-
-    function loadEntries() {
-      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
-      const tbody = document.getElementById('entryTable');
-      tbody.innerHTML = '';
-      let totalCredit = 0;
-      let totalAmount = 0;
-
-      entries.forEach(entry => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${entry.date}</td>
-          <td>${entry.product}</td>
-          <td>₹${entry.credit}</td>
-          <td>₹${entry.amount}</td>
-        `;
-        tbody.appendChild(row);
-        totalCredit += Number(entry.credit);
-        totalAmount += Number(entry.amount);
-      });
-
-      document.getElementById('totalCredit').textContent = '₹' + totalCredit.toFixed(2);
-      document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
-    }
-
-    function addEntry() {
-      const product = document.getElementById('product').value;
-      const credit = document.getElementById('credit').value || "0";
-      const amount = document.getElementById('amount').value || "0";
-
-      if (!product) {
-        alert("પ્રોડક્ટનું નામ લખો");
-        return;
-      }
-
-      const newEntry = {
-        date: new Date().toLocaleDateString(),
-        product,
-        credit,
-        amount
-      };
-
-      const oldEntries = JSON.parse(localStorage.getItem(customer) || '[]');
-      oldEntries.push(newEntry);
-      localStorage.setItem(customer, JSON.stringify(oldEntries));
-
-      document.getElementById('product').value = '';
-      document.getElementById('credit').value = '';
-      document.getElementById('amount').value = '';
-
-      loadEntries();
+      document.getElementById("customerDetails").innerText = "ગ્રાહકનું નામ નથી મળ્યું.";
     }
   </script>
 </body>
