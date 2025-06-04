@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="gu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ગ્રાહક યાદી</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ગ્રાહક પસંદ કરો</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -15,84 +14,39 @@
     h2 {
       color: #ffdd99;
     }
-    input {
+    input, button {
       padding: 10px;
       margin: 10px 0;
       border-radius: 5px;
       border: none;
       font-size: 1em;
-      width: 100%;
+    }
+    input {
       background-color: #2b2b3c;
       color: #fff;
+      width: 200px;
     }
-    ul {
-      list-style: none;
-      padding-left: 0;
-      max-height: 300px;
-      overflow-y: auto;
-      border: 1px solid #333;
-      background-color: #1d1d2c;
-      border-radius: 5px;
-    }
-    li {
-      padding: 10px;
-      border-bottom: 1px solid #333;
-    }
-    li a {
-      color: #f2c766;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    li a:hover {
-      text-decoration: underline;
+    button {
+      background-color: #f2c766;
+      color: #000;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h2>ગ્રાહકોની યાદી</h2>
-
-  <input
-    type="text"
-    id="searchBox"
-    placeholder="ગ્રાહકનું નામ શોધો"
-    onkeyup="filterCustomers()"
-  />
-
-  <ul id="customerList"></ul>
+  <h2>ગ્રાહકનું નામ દાખલ કરો</h2>
+  <input type="text" id="customerName" placeholder="ગ્રાહકનું નામ" />
+  <button onclick="goToDetails()">આગળ વધો</button>
 
   <script>
-    if (localStorage.length === 0) {
-      localStorage.setItem("રાજુ પટેલ", "ખરીદી તારીખ: 10/03/2025");
-      localStorage.setItem("મીના દેસાઈ", "લોન: 5,000 રૂપિયા");
-    }
-
-    function loadCustomers() {
-      const list = document.getElementById("customerList");
-      list.innerHTML = "";
-      if (localStorage.length === 0) {
-        list.innerHTML = "<li>કોઈ ગ્રાહક મળ્યા નથી</li>";
+    function goToDetails() {
+      const name = document.getElementById('customerName').value.trim();
+      if (!name) {
+        alert("કૃપા કરીને ગ્રાહકનું નામ દાખલ કરો");
         return;
       }
-      for (let i = 0; i < localStorage.length; i++) {
-        const name = localStorage.key(i);
-        const li = document.createElement("li");
-        li.innerHTML = `<a href="details.html?name=${encodeURIComponent(
-          name
-        )}">${name}</a>`;
-        list.appendChild(li);
-      }
+      window.location.href = "details.html?name=" + encodeURIComponent(name);
     }
-
-    function filterCustomers() {
-      const input = document.getElementById("searchBox").value.toLowerCase();
-      const list = document.getElementById("customerList").getElementsByTagName("li");
-      for (let i = 0; i < list.length; i++) {
-        const name = list[i].textContent.toLowerCase();
-        list[i].style.display = name.includes(input) ? "" : "none";
-      }
-    }
-
-    loadCustomers();
   </script>
 </body>
 </html>
