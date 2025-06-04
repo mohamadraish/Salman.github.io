@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>લોગિન પેજ</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121221;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    h2 {
+      color: #ffdd99;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+      width: 250px;
+    }
+    input {
+      background-color: #2b2b3c;
+      color: #fff;
+    }
+    button {
+      background-color: #f2c766;
+      color: #000;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>લોગિન કરો</h2>
+  <input type="text" id="username" placeholder="વપરાશકર્તા નામ" />
+  <input type="password" id="password" placeholder="પાસવર્ડ" />
+  <button onclick="login()">લોગિન</button>
+  <div class="error" id="errorMsg"></div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (username === "raees123" && password === "000000") {
+        window.location.href = "index.html";
+      } else {
+        document.getElementById('errorMsg').textContent = "ખોટું વપરાશકર્તા નામ અથવા પાસવર્ડ";
+      }
+    }
+  </script>
+</body>
+</html>
