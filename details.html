@@ -80,6 +80,10 @@
     const urlParams = new URLSearchParams(window.location.search);
     const customer = urlParams.get('name');
     const nameEl = document.getElementById('customerName');
+    if (!customer) {
+      alert("ગ્રાહકનું નામ URL માં પાસ થયેલું નથી.");
+      throw new Error("Customer name missing in URL");
+    }
     nameEl.textContent = customer + ' ની વિગતો';
 
     function loadEntries() {
@@ -94,8 +98,8 @@
         row.innerHTML = `
           <td>${entry.date}</td>
           <td>${entry.product}</td>
-          <td>₹${entry.credit}</td>
-          <td>₹${entry.amount}</td>
+          <td>₹${Number(entry.credit).toFixed(2)}</td>
+          <td>₹${Number(entry.amount).toFixed(2)}</td>
         `;
         tbody.appendChild(row);
         totalCredit += Number(entry.credit);
@@ -107,41 +111,41 @@
     }
 
     function addEntry() {
-      const product = document.getElementById('product').value;
-      const credit = document.getElementById('credit').value || "0";
-      const amount = document.getElementById('amount').value || "0";
+      const product = document.getElementById('product').value.trim();
+      const credit = document.getElementById('credit').value;
+      const amount = document.getElementById('amount').value;
 
       if (!product) {
         alert("પ્રોડક્ટનું નામ લખો");
+        return;
+      }
+      if (credit === '' && amount === '') {
+        alert("ઉધાર કે જમા રકમમાંથી એક આપો");
         return;
       }
 
       const newEntry = {
         date: new Date().toLocaleDateString(),
         product,
-        credit,
-        amount
+        credit: credit === '' ? 0 : Number(credit),
+        amount: amount === '' ? 0 : Number(amount)
       };
 
       const oldEntries = JSON.parse(localStorage.getItem(customer) || '[]');
       oldEntries.push(newEntry);
       localStorage.setItem(customer, JSON.stringify(oldEntries));
 
-      // Clear fields
+      // Clear input fields
       document.getElementById('product').value = '';
       document.getElementById('credit').value = '';
       document.getElementById('amount').value = '';
 
-      // Reload entries
       loadEntries();
     }
 
-    if (customer) {
-      loadEntries();
-    } else {
-      alert("ગ્રાહકનું નામ URL માં પાસ થયેલું નથી.");
-    }
+    loadEntries();
   </script>
 </body>
 </html>
+
 
