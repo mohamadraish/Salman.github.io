@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ગ્રાહક વિગત</title>
+  <title>ગ્રાહક વિગતો</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -13,61 +12,136 @@
       padding: 20px;
     }
     h2 {
-      color: #f2c766;
+      color: #ffdd99;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #1d1d2c;
     }
     th, td {
-      border: 1px solid #333;
       padding: 10px;
+      border: 1px solid #333;
       text-align: left;
     }
     th {
+      background-color: #2e2e3f;
+      color: #f2c766;
+    }
+    td {
+      background-color: #1d1d2c;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 5px 0 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+    }
+    input {
       background-color: #2b2b3c;
-      color: #ffdd99;
+      color: #fff;
+    }
+    button {
+      background-color: #f2c766;
+      color: #000;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h2 id="customerName">ગ્રાહક વિગત</h2>
-  <table id="dataTable">
+  <h2 id="customerName"></h2>
+
+  <input type="text" id="product" placeholder="પ્રોડક્ટનું નામ" />
+  <input type="number" id="credit" placeholder="ઉધાર રકમ" />
+  <input type="number" id="amount" placeholder="જમા રકમ" />
+  <button onclick="addEntry()">ઉમેરો</button>
+
+  <table>
     <thead>
       <tr>
         <th>તારીખ</th>
-        <th>ઉત્પાદન</th>
+        <th>પ્રોડક્ટ</th>
+        <th>ઉધાર</th>
         <th>જમા</th>
-        <th>રકમ</th>
       </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody id="entryTable"></tbody>
+    <tfoot>
+      <tr>
+        <th colspan="2">કુલ ઉધાર</th>
+        <th id="totalCredit">₹0</th>
+        <th id="totalAmount">₹0</th>
+      </tr>
+    </tfoot>
   </table>
 
   <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get("name");
-    document.getElementById("customerName").innerText = name + " ની વિગતો";
+    const customer = urlParams.get('name');
+    const nameEl = document.getElementById('customerName');
+    nameEl.textContent = customer + ' ની વિગતો';
 
-    const rawData = localStorage.getItem(name);
-    if (rawData) {
-      const data = JSON.parse(rawData);
-      const tbody = document.querySelector("#dataTable tbody");
+    function loadEntries() {
+      const entries = JSON.parse(localStorage.getItem(customer) || '[]');
+      const tbody = document.getElementById('entryTable');
+      tbody.innerHTML = '';
+      let totalCredit = 0;
+      let totalAmount = 0;
 
-      data.forEach(entry => {
-        const row = document.createElement("tr");
+      entries.forEach(entry => {
+        const row = document.createElement('tr');
         row.innerHTML = `
           <td>${entry.date}</td>
           <td>${entry.product}</td>
-          <td>${entry.credit}</td>
-          <td>${entry.amount}</td>
+          <td>₹${entry.credit}</td>
+          <td>₹${entry.amount}</td>
         `;
         tbody.appendChild(row);
+        totalCredit += Number(entry.credit);
+        totalAmount += Number(entry.amount);
       });
+
+      document.getElementById('totalCredit').textContent = '₹' + totalCredit.toFixed(2);
+      document.getElementById('totalAmount').textContent = '₹' + totalAmount.toFixed(2);
+    }
+
+    function addEntry() {
+      const product = document.getElementById('product').value;
+      const credit = document.getElementById('credit').value || "0";
+      const amount = document.getElementById('amount').value || "0";
+
+      if (!product) {
+        alert("પ્રોડક્ટનું નામ લખો");
+        return;
+      }
+
+      const newEntry = {
+        date: new Date().toLocaleDateString(),
+        product,
+        credit,
+        amount
+      };
+
+      const oldEntries = JSON.parse(localStorage.getItem(customer) || '[]');
+      oldEntries.push(newEntry);
+      localStorage.setItem(customer, JSON.stringify(oldEntries));
+
+      // Clear fields
+      document.getElementById('product').value = '';
+      document.getElementById('credit').value = '';
+      document.getElementById('amount').value = '';
+
+      // Reload entries
+      loadEntries();
+    }
+
+    if (customer) {
+      loadEntries();
+    } else {
+      alert("ગ્રાહકનું નામ URL માં પાસ થયેલું નથી.");
     }
   </script>
 </body>
 </html>
+
