@@ -1,77 +1,75 @@
+
 <!DOCTYPE html>
 <html lang="gu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login - Email Based</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grahak Management</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #121221;
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #0c0b1d;
       color: #fff;
-      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
-    input, button {
+    h1 {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 20px;
+      color: white;
+    }
+    .star {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 25px;
+      color: limegreen;
+    }
+    .login-container {
+      text-align: center;
+    }
+    .login-container h2 {
+      color: #f7e6b5;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    input {
       display: block;
-      margin: 12px 0;
+      width: 250px;
+      margin: 10px auto;
       padding: 10px;
-      width: 280px;
-      font-size: 1em;
+      font-size: 16px;
       border-radius: 5px;
       border: none;
+      background-color: #1d1c2e;
+      color: #fff;
     }
     button {
-      background-color: #f2c766;
-      color: #000;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #f7c948;
+      color: black;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
-    }
-    a {
-      color: #f2c766;
-      text-decoration: underline;
-      cursor: pointer;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>Login with Email</h2>
-
-  <label>Email:</label>
-  <input type="email" id="email" placeholder="example@gmail.com" />
-
-  <label>Password:</label>
-  <input type="password" id="password" placeholder="પાસવર્ડ લખો" />
-
-  <button onclick="login()">Login</button>
-
-  <p><a onclick="forgot()">Forget Password?</a></p>
-
-  <script>
-    const users = {
-      "raees@gmail.com": { password: "000000", name: "raees" },
-      "salman@gmail.com": { password: "111111", name: "salman" }
-    };
-
-    function login() {
-      const email = document.getElementById('email').value.trim().toLowerCase();
-      const password = document.getElementById('password').value;
-
-      if (users[email] && users[email].password === password) {
-        alert("Login સફળ!");
-        window.location.href = "details.html?name=" + users[email].name;
-      } else {
-        alert("ઈમેઈલ અથવા પાસવર્ડ ખોટો છે");
-      }
-    }
-
-    function forgot() {
-      const email = document.getElementById('email').value.trim().toLowerCase();
-      if (users[email]) {
-        alert("તમારું પાસવર્ડ છે: " + users[email].password);
-      } else {
-        alert("આ ઈમેઈલ રજીસ્ટર નથી.");
-      }
-    }
-  </script>
+  <h1>GRAHAK MANAGEMENT</h1>
+  <div class="star">★</div>
+  <div class="login-container">
+    <h2>લૉગિન કરો</h2>
+    <input type="text" placeholder="વપરાશકર્તા નામ" />
+    <input type="password" placeholder="પાસવર્ડ" />
+    <button>લૉગિન</button>
+  </div>
 </body>
 </html>
-
