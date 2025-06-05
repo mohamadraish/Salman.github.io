@@ -62,7 +62,6 @@
     const userData = {
       username: 'raees123',
       password: '000000',
-      mobile: '9876543210',
       otp: null,
     };
 
@@ -72,11 +71,6 @@
         alert('સાચું 10 અંકનું મોબાઇલ નંબર દાખલ કરો');
         return;
       }
-      if (mobile !== userData.mobile) {
-        alert('આ મોબાઇલ નંબર અમારી રજિસ્ટર્ડ યાદીમાં નથી');
-        return;
-      }
-      // Generate 6-digit OTP
       userData.otp = Math.floor(100000 + Math.random() * 900000).toString();
       alert('તમારું OTP છે: ' + userData.otp + '\n(પ્રેક્ટિસ માટે)');
 
@@ -87,7 +81,6 @@
       const enteredOtp = document.getElementById('otp').value.trim();
       if (enteredOtp === userData.otp) {
         alert('લોગિન સફળ!');
-        // અહીં લોગિન પછીનું પેજ ખોલો અથવા redirection કરો
         window.location.href = 'details.html?name=raees123';
       } else {
         alert('ખોટો OTP!');
@@ -105,12 +98,7 @@
     }
 
     function forgetPassword() {
-      const mobile = prompt('તમારું રજિસ્ટર્ડ મોબાઇલ નંબર લખો');
-      if (mobile === userData.mobile) {
-        alert('તમારું પાસવર્ડ છે: ' + userData.password);
-      } else {
-        alert('આ મોબાઇલ નંબર અમારી રજિસ્ટર્ડ યાદીમાં નથી');
-      }
+      alert('તમારું પાસવર્ડ છે: ' + userData.password);
     }
   </script>
 </body>
