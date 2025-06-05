@@ -6,46 +6,105 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      background-color: #0c0b18;
+      font-family: 'Arial', sans-serif;
+      color: #fce8b1;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      height: 100vh;
     }
+
+    header {
+      background-color: #1f1f1f;
+      padding: 15px;
+      text-align: left;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
     h2 {
       margin-bottom: 20px;
     }
-    input, button {
-      padding: 10px;
-      margin: 10px;
+
+    input {
+      padding: 12px;
       width: 250px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+      background-color: #2f2f3f;
+      color: white;
       font-size: 16px;
     }
+
+    input::placeholder {
+      color: #999;
+    }
+
+    button {
+      padding: 12px 25px;
+      background-color: #ffd15e;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      color: #000;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
     #msg {
+      margin-top: 10px;
       color: red;
+    }
+
+    .star {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      font-size: 24px;
+      color: #58e558;
     }
   </style>
 </head>
 <body>
-  <h2>લૉગિન કરો</h2>
-  <input type="text" id="username" placeholder="Username"><br>
-  <input type="password" id="password" placeholder="Password"><br>
-  <button onclick="login()">Login</button>
-  <p id="msg"></p>
+
+  <header>
+    GRAHAK MANAGEMENT
+    <span class="star">★</span>
+  </header>
+
+  <div class="container">
+    <h2>લૉગિન કરો</h2>
+    <input type="text" id="username" placeholder="વપરાશકર્તા નામ">
+    <input type="password" id="password" placeholder="પાસવર્ડ">
+    <button onclick="login()">લૉગિન</button>
+    <p id="msg"></p>
+  </div>
 
   <script>
     function login() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
       if (username === "admin" && password === "1234") {
-        window.location.href = "index.html"; // તમારા મેન પેજનું નામ અહીં આપો
+        window.location.href = "index.html"; // તમારા મુખ્ય પેજનું નામ
       } else {
-        document.getElementById('msg').innerText = "ખોટું Username અથવા Password";
+        document.getElementById('msg').innerText = "ખોટું વપરાશકર્તા નામ અથવા પાસવર્ડ";
       }
     }
   </script>
+
 </body>
 </html>
+
 
