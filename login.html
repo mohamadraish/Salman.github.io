@@ -1,75 +1,51 @@
-
 <!DOCTYPE html>
 <html lang="gu">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grahak Management</title>
+  <meta charset="UTF-8">
+  <title>લૉગિન પેજ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      margin: 0;
       font-family: sans-serif;
-      background-color: #0c0b1d;
-      color: #fff;
+      background-color: #f5f5f5;
       display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
+      flex-direction: column;
     }
-    h1 {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      font-size: 20px;
-      color: white;
-    }
-    .star {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 25px;
-      color: limegreen;
-    }
-    .login-container {
-      text-align: center;
-    }
-    .login-container h2 {
-      color: #f7e6b5;
-      font-size: 24px;
+    h2 {
       margin-bottom: 20px;
     }
-    input {
-      display: block;
-      width: 250px;
-      margin: 10px auto;
+    input, button {
       padding: 10px;
+      margin: 10px;
+      width: 250px;
       font-size: 16px;
-      border-radius: 5px;
-      border: none;
-      background-color: #1d1c2e;
-      color: #fff;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #f7c948;
-      color: black;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
+    #msg {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <h1>GRAHAK MANAGEMENT</h1>
-  <div class="star">★</div>
-  <div class="login-container">
-    <h2>લૉગિન કરો</h2>
-    <input type="text" placeholder="વપરાશકર્તા નામ" />
-    <input type="password" placeholder="પાસવર્ડ" />
-    <button onclick="window.location.href='index.html'">લૉગિન</button>
-  </div>
+  <h2>લૉગિન કરો</h2>
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+  <p id="msg"></p>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if (username === "admin" && password === "1234") {
+        window.location.href = "index.html"; // તમારા મેન પેજનું નામ અહીં આપો
+      } else {
+        document.getElementById('msg').innerText = "ખોટું Username અથવા Password";
+      }
+    }
+  </script>
 </body>
 </html>
+
