@@ -51,10 +51,27 @@
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
       background-color: #e6b832;
+    }
+
+    .download-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #1dbf73;
+      color: white;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .download-btn:hover {
+      background-color: #17a862;
     }
   </style>
   <script>
@@ -73,6 +90,9 @@
 </head>
 <body>
 
+  <!-- Download Button -->
+  <a href="https://mohamadraish.github.io/Salman.github.io/app-release.apk" class="download-btn" download>એપ ડાઉનલોડ કરો</a>
+
   <div class="login-box">
     <h2>લૉગિન કરો</h2>
     <form onsubmit="validateLogin(event)">
@@ -84,4 +104,5 @@
 
 </body>
 </html>
+
 
